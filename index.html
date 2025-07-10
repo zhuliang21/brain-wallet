@@ -612,62 +612,7 @@
         <input type="hidden" id="mnemonic" />
       </div>
 
-      <!-- Seed Section -->
-      <div class="content-section">
-        <h2 style="font-size: 1.3rem; font-weight: bold; color: white; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-          <span>🌱</span>
-          <span data-i18n="seedTitle">Seed</span>
-        </h2>
-        
-        <div style="background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 12px; padding: 15px;">
-          <div style="font-size: 14px; font-weight: 500; color: #475569; margin-bottom: 10px;">Seed (Hex):</div>
-          <textarea id="seed" readonly style="background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 8px; padding: 12px; width: 100%; box-sizing: border-box; font-family: 'Courier New', monospace; font-size: 11px; word-break: break-all; resize: none; height: 80px; line-height: 1.4;"></textarea>
-        </div>
-      </div>
 
-      <!-- Extended Public Keys and Addresses -->
-      <div class="content-section">
-        <h2 style="font-size: 1.3rem; font-weight: bold; color: white; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-          <span>🔑</span>
-          <span data-i18n="keysTitle">Extended Public Keys and Addresses</span>
-        </h2>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 25px;">
-          
-          <!-- Legacy -->
-          <div style="background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 12px; padding: 15px;">
-            <div style="font-weight: bold; color: #334155; margin-bottom: 12px; font-size: 15px;" data-i18n="legacyLabel">Legacy (P2PKH)</div>
-            <div id="xpub44" style="font-family: 'Courier New', monospace; font-size: 10px; color: #475569; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 6px; word-break: break-all; line-height: 1.3; margin-bottom: 8px;"></div>
-            <div style="font-size: 13px; font-weight: 500; color: #64748b; margin-bottom: 6px;" data-i18n="addressLabel">Address:</div>
-            <div id="addr44" style="font-family: 'Courier New', monospace; font-size: 11px; color: #7c3aed; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 6px; word-break: break-all; line-height: 1.3; font-weight: bold;"></div>
-          </div>
-          
-          <!-- Nested SegWit -->
-          <div style="background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 12px; padding: 15px;">
-            <div style="font-weight: bold; color: #334155; margin-bottom: 12px; font-size: 15px;" data-i18n="segwitLabel">Nested SegWit (P2SH-P2WPKH)</div>
-            <div id="xpub49" style="font-family: 'Courier New', monospace; font-size: 10px; color: #475569; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 6px; word-break: break-all; line-height: 1.3; margin-bottom: 8px;"></div>
-            <div style="font-size: 13px; font-weight: 500; color: #64748b; margin-bottom: 6px;" data-i18n="addressLabel">Address:</div>
-            <div id="addr49" style="font-family: 'Courier New', monospace; font-size: 11px; color: #7c3aed; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 6px; word-break: break-all; line-height: 1.3; font-weight: bold;"></div>
-          </div>
-
-          <!-- Native SegWit -->
-          <div style="background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 12px; padding: 15px;">
-            <div style="font-weight: bold; color: #334155; margin-bottom: 12px; font-size: 15px;" data-i18n="nativeSegwitLabel">Native SegWit (P2WPKH)</div>
-            <div id="xpub84" style="font-family: 'Courier New', monospace; font-size: 10px; color: #475569; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 6px; word-break: break-all; line-height: 1.3; margin-bottom: 8px;"></div>
-            <div style="font-size: 13px; font-weight: 500; color: #64748b; margin-bottom: 6px;" data-i18n="addressLabel">Address:</div>
-            <div id="addr84" style="font-family: 'Courier New', monospace; font-size: 11px; color: #7c3aed; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 6px; word-break: break-all; line-height: 1.3; font-weight: bold;"></div>
-          </div>
-
-          <!-- Taproot -->
-          <div style="background: rgba(255, 255, 255, 0.6); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 12px; padding: 15px;">
-            <div style="font-weight: bold; color: #334155; margin-bottom: 12px; font-size: 15px;" data-i18n="taprootLabel">Taproot (P2TR)</div>
-            <div id="xpub86" style="font-family: 'Courier New', monospace; font-size: 10px; color: #475569; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 6px; word-break: break-all; line-height: 1.3; margin-bottom: 8px;"></div>
-            <div style="font-size: 13px; font-weight: 500; color: #64748b; margin-bottom: 6px;" data-i18n="addressLabel">Address:</div>
-            <div id="addr86" style="font-family: 'Courier New', monospace; font-size: 11px; color: #7c3aed; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 6px; word-break: break-all; line-height: 1.3; font-weight: bold;"></div>
-          </div>
-        </div>
-
-      </div>
       
       <!-- Check Usage Section -->
       <div class="content-section" style="text-align: center;">

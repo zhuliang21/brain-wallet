@@ -66,13 +66,6 @@ const translations = {
     downloadHint: 'Long-press the image to save',
     qrTitle: 'QR Code for Wallet Import',
     qrInstructions: 'Scan this QR code with your Bitcoin wallet app to import the mnemonic phrase',
-    seedTitle: 'Seed',
-    keysTitle: 'Extended Public Keys and Addresses',
-    legacyLabel: 'Legacy (P2PKH)',
-    segwitLabel: 'Nested SegWit (P2SH-P2WPKH)',
-    nativeSegwitLabel: 'Native SegWit (P2WPKH)',
-    taprootLabel: 'Taproot (P2TR)',
-    addressLabel: 'Address:',
     checkUsageBtn: 'Check Wallet Usage',
     checking: '🔍 Checking wallet usage...',
     checkingProgress: 'Checking addresses... ({current}/{total})',
@@ -103,13 +96,6 @@ const translations = {
     downloadHint: '长按图片保存',
     qrTitle: '钱包导入二维码',
     qrInstructions: '用您的比特币钱包应用扫描此二维码以导入助记词',
-    seedTitle: '种子',
-    keysTitle: '扩展公钥和地址',
-    legacyLabel: '传统格式 (P2PKH)',
-    segwitLabel: '嵌套隔离见证 (P2SH-P2WPKH)',
-    nativeSegwitLabel: '原生隔离见证 (P2WPKH)',
-    taprootLabel: 'Taproot (P2TR)',
-    addressLabel: '地址：',
     checkUsageBtn: '检查钱包使用情况',
     checking: '🔍 正在检查钱包使用情况...',
     checkingProgress: '正在检查地址... ({current}/{total})',
@@ -512,42 +498,7 @@ async function checkAddressesWithRateLimit(addresses, onProgress = null) {
   return allResults;
 }
 
-// Function to generate and display extended public keys and addresses
-function generateKeysAndAddresses(seedBuffer) {
-  const root = bip32.fromSeed(seedBuffer);
-  const configs = [
-    { id: '44', path: "m/44'/0'/0'", addressFn: node => payments.p2pkh({ pubkey: Buffer.from(node.publicKey) }).address },
-    { id: '49', path: "m/49'/0'/0'", addressFn: node => payments.p2sh({ redeem: payments.p2wpkh({ pubkey: Buffer.from(node.publicKey) }) }).address },
-    { id: '84', path: "m/84'/0'/0'", addressFn: node => payments.p2wpkh({ pubkey: Buffer.from(node.publicKey) }).address },
-    { 
-      id: '86', 
-      path: "m/86'/0'/0'", 
-      addressFn: node => {
-        try {
-          // Extract x-only public key (remove the 0x02/0x03 prefix byte)
-          const fullPubkey = Buffer.from(node.publicKey);
-          const xOnlyPubkey = fullPubkey.slice(1); // Remove first byte to get 32-byte x-only key
-          
-          return generateTaprootAddress(xOnlyPubkey);
-        } catch (e) {
-          console.error('Taproot address generation error:', e);
-          return 'bc1p...taproot (error generating)';
-        }
-      }
-    }
-  ];
-  configs.forEach(({ id, path, addressFn }) => {
-    const account = root.derivePath(path);
-    // Extended public key
-    let extPub = account.neutered().toBase58();
-    document.getElementById(`xpub${id}`).innerText = extPub;
-    const child = account.derive(0).derive(0);
-    document.getElementById(`addr${id}`).innerText = addressFn(child);
-    // Store for later usage checking (for all id types)
-    window.extPubs = window.extPubs || {};
-    window.extPubs[id] = extPub;
-  });
-}
+
 
 // UI Logic - Initialize as early as possible
 function initializeApp() {
@@ -632,9 +583,7 @@ function initializeApp() {
     
     // Generate wallet image automatically
     const seedBuf = bip39.mnemonicToSeedSync(newMnemonic);
-    document.getElementById('seed').value = seedBuf.toString('hex');
     QRCode.toCanvas(document.getElementById('qrcode'), newMnemonic, { errorCorrectionLevel: 'H' });
-    generateKeysAndAddresses(seedBuf);
     
     // Auto-generate and display image
     generateWalletImage(newMnemonic, text);
@@ -645,61 +594,7 @@ function initializeApp() {
     const fetchBtn = document.getElementById('fetchUsage');
     if (fetchBtn && usageDiv) {
       fetchBtn.onclick = async () => {
-        // Prefer querying via xpubs first
-        const xpubsList = Object.values(window.extPubs || {});
-        if (xpubsList.length === 4) {
-          usageDiv.style.display = 'block';
-          usageDiv.innerHTML = `<div style="display:flex;justify-content:center;"><div style="display:inline-flex;align-items:center;gap:12px;padding:16px 24px;background:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.4);border-radius:16px;box-shadow:0 4px 6px rgba(0,0,0,0.1);color:#4f46e5;font-weight:500;"><span style="font-size:18px;">🔍</span><span>${translations[currentLanguage].checking}</span></div></div>`;
-
-          fetchBtn.disabled = true;
-          fetchBtn.textContent = translations[currentLanguage].checkingProgress.replace('{current}', '0').replace('{total}', xpubsList.length);
-
-          try {
-            const xpubResults = await checkXpubsWithRateLimit(xpubsList, (c, t) => {
-              fetchBtn.textContent = translations[currentLanguage].checkingProgress.replace('{current}', c).replace('{total}', t);
-            });
-
-            // Evaluate results
-            const anyUsed = xpubResults.some(r => r.hasTransactions);
-            let earliestDate = null;
-            xpubResults.forEach(r => {
-              if (r.earliestDate && (!earliestDate || r.earliestDate < earliestDate)) earliestDate = r.earliestDate;
-            });
-
-            const resultDiv = document.createElement('div');
-            resultDiv.style.cssText = 'display:flex;justify-content:center;';
-
-            const totalBalance = xpubResults.reduce((acc,r)=>acc+(r.final_balance||0),0);
-            const balanceText = `${(totalBalance/1e8).toFixed(8)} BTC`;
-
-            if (anyUsed) {
-              const formatted = earliestDate ? earliestDate.toLocaleDateString(currentLanguage === 'zh' ? 'zh-CN':'en-US',{year:'numeric',month:'long',day:'numeric'}) : '';
-              resultDiv.innerHTML = `<div style="display:inline-flex;flex-direction:column;gap:8px;padding:16px 24px;background:rgba(244,242,242,0.9);border:1px solid rgba(252,165,165,0.5);border-radius:16px;box-shadow:0 4px 6px rgba(0,0,0,0.1);color:#dc2626;">
-                <div style="display:flex;align-items:center;gap:12px;font-weight:600;"><span style="font-size:20px;">⚠️</span><span>${translations[currentLanguage].walletUsedSimple}</span></div>
-                <div>${formatted}</div>
-                <div>${currentLanguage==='zh'?'余额：':'Balance:'} ${balanceText}</div>
-              </div>`;
-            } else {
-              resultDiv.innerHTML = `<div style="display:inline-flex;flex-direction:column;gap:8px;padding:16px 24px;background:rgba(240,253,244,0.9);border:1px solid rgba(134,239,172,0.5);border-radius:16px;box-shadow:0 4px 6px rgba(0,0,0,0.1);color:#16a34a;">
-                <div style="display:flex;align-items:center;gap:12px;font-weight:600;"><span style="font-size:20px;">✅</span><span>${translations[currentLanguage].walletUnusedSimple}</span></div>
-                <div>${currentLanguage==='zh'?'余额：':'Balance:'} ${balanceText}</div>
-              </div>`;
-            }
-
-            usageDiv.innerHTML = '';
-            usageDiv.appendChild(resultDiv);
-          } catch(err) {
-            console.error(err);
-            usageDiv.innerHTML = `<div style="color:#dc2626;text-align:center;">${translations[currentLanguage].errorOccurred}</div>`;
-          } finally {
-            fetchBtn.disabled = false;
-            fetchBtn.textContent = translations[currentLanguage].checkUsageBtn;
-          }
-
-          return; // Skip old per-address logic
-        }
-
-        // Fallback to old per-address checking if xpubs unavailable
+        // Check usage via addresses
         const allAddresses = generateMultipleAddresses(seedBuf, 5);
         
         // Collect all addresses into a flat array for checking
@@ -861,41 +756,4 @@ if (window.pageReady) {
   checkPageReady();
 }
 
-// New: Check usage for a list of xpubs with simple rate-limiting
-async function checkXpubsWithRateLimit(xpubs, onProgress = null) {
-  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-  const results = [];
-  let processed = 0;
-  for (const xpub of xpubs) {
-    try {
-      const url = `https://blockchain.info/multiaddr?active=${xpub}&n=1`;
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const data = await resp.json();
-      const addrInfo = (data.addresses && data.addresses[0]) || {};
-      const n_tx = addrInfo.n_tx || 0;
-      const final_balance = addrInfo.final_balance || 0;
-      let earliestDate = null;
-      if (data.txs && data.txs.length > 0) {
-        const ts = data.txs[data.txs.length - 1].time || data.txs[0].time;
-        earliestDate = ts ? new Date(ts * 1000) : null;
-      }
-      results.push({
-        xpub,
-        hasTransactions: n_tx > 0,
-        n_tx,
-        final_balance,
-        earliestDate,
-        source: 'blockchain.info'
-      });
-    } catch (err) {
-      console.error('Error checking xpub', xpub, err);
-      results.push({ xpub, error: err });
-    }
-    processed++;
-    if (onProgress) onProgress(processed, xpubs.length);
-    // simple delay to avoid rate limiting
-    await delay(1100);
-  }
-  return results;
-}
+
