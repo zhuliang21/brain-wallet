@@ -306,7 +306,7 @@ async function generateWalletImage(mnemonic, inputText) {
       img.style.cursor = 'default';
       img.style.pointerEvents = 'auto';
       img.style.userSelect = 'auto';
-      img.style.webkitUserSelect = 'auto';
+      img.webkitUserSelect = 'auto';
       img.draggable = true;
       
       // 移除任何可能阻止右键菜单的属性
@@ -401,6 +401,156 @@ function generateMultipleAddresses(seedBuffer, addressCount = 5) {
   });
   
   return allAddresses;
+}
+
+// Function to generate extended public keys for different derivation paths
+function generateExtendedPublicKeys(seedBuffer) {
+  const root = bip32.fromSeed(seedBuffer);
+  const xpubs = {};
+  
+  const configs = [
+    { id: '44', name: 'Legacy (P2PKH)', path: "m/44'/0'/0'" },
+    { id: '49', name: 'Nested SegWit (P2SH-P2WPKH)', path: "m/49'/0'/0'" },
+    { id: '84', name: 'Native SegWit (P2WPKH)', path: "m/84'/0'/0'" },
+    { id: '86', name: 'Taproot (P2TR)', path: "m/86'/0'/0'" }
+  ];
+  
+  configs.forEach(({ id, name, path }) => {
+    try {
+      const account = root.derivePath(path);
+      xpubs[id] = {
+        name,
+        path,
+        xpub: account.neutered().toBase58()
+      };
+    } catch (e) {
+      console.error(`Error generating xpub for ${name}:`, e);
+      xpubs[id] = {
+        name,
+        path,
+        xpub: null,
+        error: e.message
+      };
+    }
+  });
+  
+  return xpubs;
+}
+
+// Function to check extended public keys with rate limiting
+async function checkXpubsWithRateLimit(xpubs, onProgress = null) {
+  const DELAY_BETWEEN_REQUESTS = 2000; // 2 seconds delay between requests
+  const DELAY_BETWEEN_APIS = 1000; // 1 second delay between different APIs
+  
+  let allResults = [];
+  let processedCount = 0;
+  const xpubEntries = Object.entries(xpubs).filter(([_, xpubInfo]) => xpubInfo.xpub);
+  const totalCount = xpubEntries.length;
+  
+  // Helper function to delay execution
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  
+  // Helper function to check a single xpub
+  const checkSingleXpub = async (xpubInfo) => {
+    const { name, path, xpub } = xpubInfo;
+    console.log(`Checking xpub: ${name} (${path})`);
+    
+    const result = {
+      name,
+      path,
+      xpub,
+      hasTransactions: false,
+      earliestDate: null,
+      source: null,
+      error: null
+    };
+    
+    try {
+      // Try mempool.space first - check xpub usage
+      console.log(`Fetching from mempool.space for xpub ${name}`);
+      const res1 = await fetch(`https://mempool.space/api/xpub/${xpub}/txs`);
+      console.log(`Mempool xpub response status: ${res1.status}`);
+      
+      if (res1.ok) {
+        const txs1 = await res1.json();
+        console.log(`Mempool returned ${txs1.length} transactions for ${name}`);
+        if (txs1 && txs1.length > 0) {
+          result.hasTransactions = true;
+          result.source = 'mempool.space';
+          // Find the earliest transaction
+          const earliest = txs1.reduce((a, b) => {
+            const timeA = a.status?.block_time || 0;
+            const timeB = b.status?.block_time || 0;
+            return timeA < timeB ? a : b;
+          }).status?.block_time;
+          if (earliest) {
+            result.earliestDate = new Date(earliest * 1000);
+          }
+          return result;
+        }
+      }
+      
+      // Delay between API calls
+      await delay(DELAY_BETWEEN_APIS);
+      
+      // Try blockstream.info as fallback
+      console.log(`Fetching from blockstream.info for xpub ${name}`);
+      const res2 = await fetch(`https://blockstream.info/api/xpub/${xpub}/txs`);
+      console.log(`Blockstream xpub response status: ${res2.status}`);
+      
+      if (res2.ok) {
+        const txs2 = await res2.json();
+        console.log(`Blockstream returned ${txs2.length} transactions for ${name}`);
+        if (txs2 && txs2.length > 0) {
+          result.hasTransactions = true;
+          result.source = 'blockstream.info';
+          // Find the earliest transaction
+          const earliest = txs2.reduce((a, b) => {
+            const timeA = a.status?.block_time || 0;
+            const timeB = b.status?.block_time || 0;
+            return timeA < timeB ? a : b;
+          }).status?.block_time;
+          if (earliest) {
+            result.earliestDate = new Date(earliest * 1000);
+          }
+        }
+      }
+    } catch (e) {
+      console.log(`Error checking xpub ${name}:`, e);
+      result.error = e.message;
+    }
+    
+    console.log(`Finished checking xpub ${name}, result:`, result);
+    return result;
+  };
+  
+  // Process xpubs sequentially with delays
+  console.log(`Starting to process ${xpubEntries.length} xpubs`);
+  for (let i = 0; i < xpubEntries.length; i++) {
+    const [typeId, xpubInfo] = xpubEntries[i];
+    console.log(`Processing xpub ${i + 1}/${xpubEntries.length}: ${xpubInfo.name}`);
+    
+    const result = await checkSingleXpub(xpubInfo);
+    result.typeId = typeId;
+    allResults.push(result);
+    
+    processedCount++;
+    console.log(`Completed xpub check, processedCount: ${processedCount}, totalCount: ${totalCount}`);
+    
+    // Call progress callback
+    if (onProgress) {
+      console.log(`Calling progress callback with ${processedCount}/${totalCount}`);
+      onProgress(processedCount, totalCount);
+    }
+    
+    // Delay between requests (except for the last one)
+    if (i < xpubEntries.length - 1) {
+      console.log(`Waiting ${DELAY_BETWEEN_REQUESTS}ms before next xpub...`);
+      await delay(DELAY_BETWEEN_REQUESTS);
+    }
+  }
+  
+  return allResults;
 }
 
 // Function to check addresses with rate limiting and batching
@@ -594,20 +744,8 @@ function initializeApp() {
     const fetchBtn = document.getElementById('fetchUsage');
     if (fetchBtn && usageDiv) {
       fetchBtn.onclick = async () => {
-        // Check usage via addresses
-        const allAddresses = generateMultipleAddresses(seedBuf, 5);
-        
-        // Collect all addresses into a flat array for checking
-        const addressesToCheck = [];
-        Object.keys(allAddresses).forEach(typeId => {
-          allAddresses[typeId].addresses.forEach(addrInfo => {
-            addressesToCheck.push({
-              ...addrInfo,
-              type: typeId,
-              typeName: allAddresses[typeId].name
-            });
-          });
-        });
+        // Check usage via extended public keys (xpubs)
+        const xpubs = generateExtendedPublicKeys(seedBuf);
         
         usageDiv.style.display = 'block';
         usageDiv.innerHTML = `
@@ -624,12 +762,13 @@ function initializeApp() {
         
         // Disable the button during checking
         fetchBtn.disabled = true;
-        fetchBtn.textContent = translations[currentLanguage].checkingProgress.replace('{current}', '0').replace('{total}', addressesToCheck.length);
+        const validXpubs = Object.values(xpubs).filter(xpub => xpub.xpub);
+        fetchBtn.textContent = translations[currentLanguage].checkingProgress.replace('{current}', '0').replace('{total}', validXpubs.length);
         
         try {
-          // Check addresses with rate limiting
-          const results = await checkAddressesWithRateLimit(
-            addressesToCheck.map(a => a.address),
+          // Check xpubs with rate limiting
+          const results = await checkXpubsWithRateLimit(
+            xpubs,
             (current, total) => {
               // Update progress
               fetchBtn.textContent = translations[currentLanguage].checkingProgress.replace('{current}', current).replace('{total}', total);
@@ -639,17 +778,12 @@ function initializeApp() {
           // Process results
           let hasUsage = false;
           let earliestUsageDate = null;
-          const usedAddresses = [];
+          const usedXpubs = [];
           
-          results.forEach((result, index) => {
+          results.forEach((result) => {
             if (result.hasTransactions) {
               hasUsage = true;
-              const addressInfo = addressesToCheck[index];
-              usedAddresses.push({
-                ...addressInfo,
-                earliestDate: result.earliestDate,
-                source: result.source
-              });
+              usedXpubs.push(result);
               
               if (!earliestUsageDate || result.earliestDate < earliestUsageDate) {
                 earliestUsageDate = result.earliestDate;
@@ -699,7 +833,7 @@ function initializeApp() {
           usageDiv.appendChild(resultDiv);
           
         } catch (error) {
-          console.error('Error during address checking:', error);
+          console.error('Error during xpub checking:', error);
           usageDiv.innerHTML = `
             <div style="display: flex; justify-content: center;">
               <div style="display: inline-flex; align-items: flex-start; gap: 12px; padding: 16px 24px; max-width: 400px;
