@@ -732,31 +732,26 @@ function initializeApp() {
         // Check usage via extended public keys (xpubs)
         const xpubs = generateExtendedPublicKeys(seedBuf);
         
-        usageDiv.style.display = 'block';
-        usageDiv.innerHTML = `
-          <div style="display: flex; justify-content: center;">
-            <div style="display: inline-flex; align-items: center; gap: 12px; padding: 16px 24px; 
-                        background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(255, 255, 255, 0.4); 
-                        border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                        color: #4f46e5; font-weight: 500;">
-              <span style="font-size: 18px;">🔍</span>
-              <span>${translations[currentLanguage].checking}</span>
-            </div>
-          </div>
-        `;
+        // Hide the usage results div completely
+        usageDiv.style.display = 'none';
+        usageDiv.innerHTML = '';
         
-        // Disable the button during checking
+        // Store original button state
+        const originalText = fetchBtn.textContent;
+        const originalDisabled = fetchBtn.disabled;
+        
+        // Update button to show checking status
         fetchBtn.disabled = true;
         const validXpubs = Object.values(xpubs).filter(xpub => xpub.xpub);
-        fetchBtn.textContent = translations[currentLanguage].checkingProgress.replace('{current}', '0').replace('{total}', validXpubs.length);
+        fetchBtn.textContent = `🔍 ${translations[currentLanguage].checking}`;
         
         try {
           // Check xpubs with rate limiting
           const results = await checkXpubsWithRateLimit(
             xpubs,
             (current, total) => {
-              // Update progress
-              fetchBtn.textContent = translations[currentLanguage].checkingProgress.replace('{current}', current).replace('{total}', total);
+              // Update progress in button
+              fetchBtn.textContent = `🔍 ${translations[currentLanguage].checkingProgress.replace('{current}', current).replace('{total}', total)}`;
             }
           );
           
@@ -776,71 +771,45 @@ function initializeApp() {
             }
           });
           
-          // Display results with inline styles
-          const resultDiv = document.createElement('div');
-          resultDiv.style.cssText = 'display: flex; justify-content: center;';
-          
+          // Update button to show final result
           if (hasUsage) {
-            const formattedDate = earliestUsageDate.toLocaleDateString(currentLanguage === 'zh' ? 'zh-CN' : 'en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            });
-            
-            resultDiv.innerHTML = `
-              <div style="display: inline-flex; align-items: center; gap: 12px; padding: 16px 24px; max-width: 400px;
-                          background: rgba(254, 242, 242, 0.9); border: 1px solid rgba(252, 165, 165, 0.5); 
-                          border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                          color: #dc2626;">
-                <span style="font-size: 20px; flex-shrink: 0;">⚠️</span>
-                <div style="font-weight: 600;">
-                  ${translations[currentLanguage].walletUsedSimple}
-                </div>
-              </div>
-            `;
+            fetchBtn.textContent = `⚠️ ${translations[currentLanguage].walletUsedSimple}`;
+            fetchBtn.style.backgroundColor = '#fef2f2';
+            fetchBtn.style.borderColor = '#fca5a5';
+            fetchBtn.style.color = '#dc2626';
           } else {
-            resultDiv.innerHTML = `
-              <div style="display: inline-flex; align-items: center; gap: 12px; padding: 16px 24px; max-width: 400px;
-                          background: rgba(240, 253, 244, 0.9); border: 1px solid rgba(134, 239, 172, 0.5); 
-                          border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                          color: #16a34a;">
-                <span style="font-size: 20px; flex-shrink: 0;">✅</span>
-                <div style="font-weight: 600;">
-                  ${translations[currentLanguage].walletUnusedSimple}
-                </div>
-              </div>
-            `;
+            fetchBtn.textContent = `✅ ${translations[currentLanguage].walletUnusedSimple}`;
+            fetchBtn.style.backgroundColor = '#f0fdf4';
+            fetchBtn.style.borderColor = '#86efac';
+            fetchBtn.style.color = '#16a34a';
           }
           
-          usageDiv.innerHTML = '';
-          usageDiv.appendChild(resultDiv);
+          // Auto-reset button after 5 seconds
+          setTimeout(() => {
+            fetchBtn.textContent = originalText;
+            fetchBtn.style.backgroundColor = '';
+            fetchBtn.style.borderColor = '';
+            fetchBtn.style.color = '';
+            fetchBtn.disabled = originalDisabled;
+          }, 5000);
           
         } catch (error) {
           console.error('Error during xpub checking:', error);
-          usageDiv.innerHTML = `
-            <div style="display: flex; justify-content: center;">
-              <div style="display: inline-flex; align-items: flex-start; gap: 12px; padding: 16px 24px; max-width: 400px;
-                          background: rgba(254, 242, 242, 0.9); border: 1px solid rgba(252, 165, 165, 0.5); 
-                          border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                          color: #dc2626;">
-                <span style="font-size: 20px; flex-shrink: 0; margin-top: 2px;">❌</span>
-                <div>
-                  <div style="font-weight: 600; margin-bottom: 8px;">
-                    ${translations[currentLanguage].errorOccurred}
-                  </div>
-                  <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;">
-                    ${translations[currentLanguage].retryOrCheckNetwork}
-                  </p>
-                </div>
-              </div>
-            </div>
-          `;
-        } finally {
-          // Re-enable the button
-          fetchBtn.disabled = false;
-          fetchBtn.textContent = translations[currentLanguage].checkUsageBtn;
+          
+          // Show error in button
+          fetchBtn.textContent = `❌ ${translations[currentLanguage].errorOccurred}`;
+          fetchBtn.style.backgroundColor = '#fef2f2';
+          fetchBtn.style.borderColor = '#fca5a5';
+          fetchBtn.style.color = '#dc2626';
+          
+          // Auto-reset button after 5 seconds
+          setTimeout(() => {
+            fetchBtn.textContent = originalText;
+            fetchBtn.style.backgroundColor = '';
+            fetchBtn.style.borderColor = '';
+            fetchBtn.style.color = '';
+            fetchBtn.disabled = originalDisabled;
+          }, 5000);
         }
       };
     }
