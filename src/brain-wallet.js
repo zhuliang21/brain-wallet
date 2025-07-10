@@ -439,8 +439,7 @@ function generateExtendedPublicKeys(seedBuffer) {
 
 // Function to check extended public keys with rate limiting
 async function checkXpubsWithRateLimit(xpubs, onProgress = null) {
-  const DELAY_BETWEEN_REQUESTS = 2000; // 2 seconds delay between requests
-  const DELAY_BETWEEN_APIS = 1000; // 1 second delay between different APIs
+  const DELAY_BETWEEN_REQUESTS = 3000; // 3 seconds delay between requests for blockchain.info
   
   let allResults = [];
   let processedCount = 0;
@@ -450,7 +449,7 @@ async function checkXpubsWithRateLimit(xpubs, onProgress = null) {
   // Helper function to delay execution
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   
-  // Helper function to check a single xpub
+  // Helper function to check a single xpub using blockchain.info API
   const checkSingleXpub = async (xpubInfo) => {
     const { name, path, xpub } = xpubInfo;
     console.log(`Checking xpub: ${name} (${path})`);
@@ -466,54 +465,40 @@ async function checkXpubsWithRateLimit(xpubs, onProgress = null) {
     };
     
     try {
-      // Try mempool.space first - check xpub usage
-      console.log(`Fetching from mempool.space for xpub ${name}`);
-      const res1 = await fetch(`https://mempool.space/api/xpub/${xpub}/txs`);
-      console.log(`Mempool xpub response status: ${res1.status}`);
+      // Use blockchain.info xpub API
+      console.log(`Fetching from blockchain.info for xpub ${name}`);
+      const res = await fetch(`https://blockchain.info/xpub/${xpub}?format=json&limit=1`);
+      console.log(`Blockchain.info xpub response status: ${res.status}`);
       
-      if (res1.ok) {
-        const txs1 = await res1.json();
-        console.log(`Mempool returned ${txs1.length} transactions for ${name}`);
-        if (txs1 && txs1.length > 0) {
+      if (res.ok) {
+        const data = await res.json();
+        console.log(`Blockchain.info returned data for ${name}:`, data);
+        
+        // Check if there are any transactions
+        if (data && data.txs && data.txs.length > 0) {
           result.hasTransactions = true;
-          result.source = 'mempool.space';
-          // Find the earliest transaction
-          const earliest = txs1.reduce((a, b) => {
-            const timeA = a.status?.block_time || 0;
-            const timeB = b.status?.block_time || 0;
-            return timeA < timeB ? a : b;
-          }).status?.block_time;
-          if (earliest) {
-            result.earliestDate = new Date(earliest * 1000);
+          result.source = 'blockchain.info';
+          
+          // Find the earliest transaction time
+          const earliestTx = data.txs.reduce((earliest, tx) => {
+            const txTime = tx.time || 0;
+            const earliestTime = earliest.time || 0;
+            return txTime < earliestTime ? tx : earliest;
+          });
+          
+          if (earliestTx.time) {
+            result.earliestDate = new Date(earliestTx.time * 1000);
           }
-          return result;
-        }
-      }
-      
-      // Delay between API calls
-      await delay(DELAY_BETWEEN_APIS);
-      
-      // Try blockstream.info as fallback
-      console.log(`Fetching from blockstream.info for xpub ${name}`);
-      const res2 = await fetch(`https://blockstream.info/api/xpub/${xpub}/txs`);
-      console.log(`Blockstream xpub response status: ${res2.status}`);
-      
-      if (res2.ok) {
-        const txs2 = await res2.json();
-        console.log(`Blockstream returned ${txs2.length} transactions for ${name}`);
-        if (txs2 && txs2.length > 0) {
+        } else if (data && data.n_tx && data.n_tx > 0) {
+          // Alternative check - if total transaction count is greater than 0
           result.hasTransactions = true;
-          result.source = 'blockstream.info';
-          // Find the earliest transaction
-          const earliest = txs2.reduce((a, b) => {
-            const timeA = a.status?.block_time || 0;
-            const timeB = b.status?.block_time || 0;
-            return timeA < timeB ? a : b;
-          }).status?.block_time;
-          if (earliest) {
-            result.earliestDate = new Date(earliest * 1000);
-          }
+          result.source = 'blockchain.info';
+          // Note: blockchain.info doesn't always provide transaction details in summary
+          // so we might not have the exact earliest date
         }
+      } else {
+        console.log(`Blockchain.info API error for ${name}: ${res.status} ${res.statusText}`);
+        result.error = `API error: ${res.status}`;
       }
     } catch (e) {
       console.log(`Error checking xpub ${name}:`, e);
@@ -525,7 +510,7 @@ async function checkXpubsWithRateLimit(xpubs, onProgress = null) {
   };
   
   // Process xpubs sequentially with delays
-  console.log(`Starting to process ${xpubEntries.length} xpubs`);
+  console.log(`Starting to process ${xpubEntries.length} xpubs using blockchain.info`);
   for (let i = 0; i < xpubEntries.length; i++) {
     const [typeId, xpubInfo] = xpubEntries[i];
     console.log(`Processing xpub ${i + 1}/${xpubEntries.length}: ${xpubInfo.name}`);
