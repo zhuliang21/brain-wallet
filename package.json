@@ -1,0 +1,50 @@
+{
+  "name": "brain-wallet",
+  "version": "1.0.0",
+  "description": "A secure brain wallet generator for Bitcoin",
+  "main": "index.html",
+  "scripts": {
+    "build": "npx webpack",
+    "serve": "npx http-server -p 8080",
+    "serve-https": "npx http-server -p 8443 -S -C cert.pem -K key.pem"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@bitcoinerlab/secp256k1": "^1.2.0",
+    "@ngraveio/bc-ur": "^2.0.0-beta.9",
+    "@ngraveio/ur-blockchain-commons": "^2.0.0",
+    "@scure/btc-signer": "^1.8.1",
+    "bbqr": "^1.2.0",
+    "bech32": "^2.0.0",
+    "bip32": "^2.0.6",
+    "bip39": "^3.1.0",
+    "bitcoinjs-lib": "^6.1.7",
+    "bs58check": "^4.0.0",
+    "html5-qrcode": "^2.3.8",
+    "jsqr": "^1.4.0",
+    "qrcode": "^1.5.4",
+    "qrious": "^4.0.2",
+    "tiny-secp256k1": "^1.1.0",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "assert": "^2.1.0",
+    "babel-loader": "^10.0.0",
+    "browserify": "^17.0.1",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "http-server": "^14.1.1",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0",
+    "url": "^0.11.4",
+    "util": "^0.12.5",
+    "vm-browserify": "^1.1.2",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1"
+  }
+}
