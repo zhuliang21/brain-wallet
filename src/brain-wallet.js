@@ -87,7 +87,8 @@ const translations = {
     errorOccurred: 'An error occurred during checking',
     retryOrCheckNetwork: 'Please try again later or check your network connection',
     warningBanner: 'Brain wallets cannot provide sufficient randomness and are for testing purposes only. Use with caution.',
-    newWalletBtn: '🔄 Generate New Wallet'
+    newWalletBtn: '🔄 Generate New Wallet',
+    shaHint: 'SHA256 of text below'
   },
   zh: {
     back: '←',
@@ -123,7 +124,8 @@ const translations = {
     errorOccurred: '检查过程中出现错误',
     retryOrCheckNetwork: '请稍后重试，或检查网络连接',
     warningBanner: '脑钱包难以提供足够的随机性，仅供测试目的，谨慎使用。',
-    newWalletBtn: '🔄 生成新钱包'
+    newWalletBtn: '🔄 生成新钱包',
+    shaHint: '钱包根据以下文字 SHA256 生成'
   }
 };
 
@@ -246,16 +248,27 @@ async function generateWalletImage(mnemonic, inputText) {
     const txtCenterY = bottomY + txtAreaHeight / 2;
     const txtCenterX = baseW / 2;
 
-    ctx.font = 'bold 16px monospace';
+    // Upper text font (Local LXGWWenKai + fallback, bold weight)
+    ctx.font = 'bold 20px "LXGWWenKai", "Kaiti SC", STKaiti, KaiTi, "Noto Serif SC", monospace';
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'center';
 
     const txtMaxWidth = 360;
     const shortText = inputText.length > 60 ? `${inputText.slice(0, 60)}...` : inputText;
     const txtLines = wrapText(ctx, shortText, txtMaxWidth);
-    const txtLineHeight = 22;
+    const txtLineHeight = 28;
     const txtBlockHeight = txtLines.length * txtLineHeight;
     let startTxtY = txtCenterY - txtBlockHeight / 2 + txtLineHeight / 2;
+
+    // Text to show explanation line
+    const shaHint = translations[currentLanguage].shaHint || 'SHA256 of text below';
+    ctx.font = '14px "LXGWWenKai", "Kaiti SC", STKaiti, KaiTi, "Noto Serif SC", monospace';
+    ctx.fillStyle = '#555555';
+    ctx.fillText(shaHint, txtCenterX, txtCenterY - txtBlockHeight / 2 - 12);
+
+    // Reset font to bold for input text
+    ctx.font = 'bold 20px "LXGWWenKai", "Kaiti SC", STKaiti, KaiTi, "Noto Serif SC", monospace';
+    ctx.fillStyle = '#000000';
 
     txtLines.forEach((line) => {
       ctx.fillText(line, txtCenterX, startTxtY);
@@ -263,25 +276,27 @@ async function generateWalletImage(mnemonic, inputText) {
     });
 
     /* 3b. Mnemonic words centred in bottom half (400x200) */
-    ctx.font = 'bold 14px monospace';
-    ctx.textAlign = 'left';
+    // Lower text font (Local LXGWWenKai + fallback, normal weight)
+    ctx.font = '18px "LXGWWenKai", "Kaiti SC", STKaiti, KaiTi, "Noto Serif SC", monospace';
+    ctx.textAlign = 'center';
 
     const words = mnemonic.split(' ');
     const cols = 3;
     const rows = 4;
-    const colW = 110;
-    const rowH = 32;
+    const colW = 130; // 增加列宽，让文字有更多空间
+    const rowH = 38;
 
     // compute total block size
     const mBlockW = colW * cols;
     const mBlockH = rowH * rows;
     const mStartX = (baseW - mBlockW) / 2;
-    const mStartY = bottomY + txtAreaHeight + (txtAreaHeight - mBlockH) / 2 + 6; // small offset for visual balance
+    const mStartY = bottomY + txtAreaHeight + (txtAreaHeight - mBlockH) / 2 + 8; // small offset for visual balance
 
     for (let i = 0; i < words.length; i += 1) {
       const col = i % cols;
       const row = Math.floor(i / cols);
-      const x = mStartX + col * colW;
+      // 每个格子的中心点
+      const x = mStartX + col * colW + colW / 2;
       const y = mStartY + row * rowH;
       ctx.fillText(`${i + 1}.${words[i]}`, x, y);
     }
@@ -292,11 +307,30 @@ async function generateWalletImage(mnemonic, inputText) {
     const hint = document.getElementById('downloadHint');
 
     if (img) {
+      // 清除所有之前的事件监听器
+      img.oncontextmenu = null;
+      img.onclick = null;
+      img.removeEventListener('contextmenu', arguments.callee);
+      img.removeEventListener('click', arguments.callee);
+      
+      // 设置图片属性，让它表现得像一个正常的网页图片
       img.src = dataURL;
+      img.alt = 'Brain Wallet Image';
       img.style.display = 'block';
-      // Remove automatic click download; rely on long-press / context menu
       img.style.cursor = 'default';
-      if (hint) hint.style.display = 'block';
+      img.style.pointerEvents = 'auto';
+      img.style.userSelect = 'auto';
+      img.style.webkitUserSelect = 'auto';
+      img.draggable = true;
+      
+      // 移除任何可能阻止右键菜单的属性
+      img.removeAttribute('oncontextmenu');
+      img.removeAttribute('onclick');
+      
+      if (hint) {
+        hint.style.display = 'block';
+        hint.textContent = currentLanguage === 'zh' ? '右键保存图片' : 'Right-click to save image';
+      }
     }
   } catch (e) {
     console.error('generateWalletImage error', e);
@@ -640,7 +674,7 @@ function initializeApp() {
 
             if (anyUsed) {
               const formatted = earliestDate ? earliestDate.toLocaleDateString(currentLanguage === 'zh' ? 'zh-CN':'en-US',{year:'numeric',month:'long',day:'numeric'}) : '';
-              resultDiv.innerHTML = `<div style="display:inline-flex;flex-direction:column;gap:8px;padding:16px 24px;background:rgba(254,242,242,0.9);border:1px solid rgba(252,165,165,0.5);border-radius:16px;box-shadow:0 4px 6px rgba(0,0,0,0.1);color:#dc2626;">
+              resultDiv.innerHTML = `<div style="display:inline-flex;flex-direction:column;gap:8px;padding:16px 24px;background:rgba(244,242,242,0.9);border:1px solid rgba(252,165,165,0.5);border-radius:16px;box-shadow:0 4px 6px rgba(0,0,0,0.1);color:#dc2626;">
                 <div style="display:flex;align-items:center;gap:12px;font-weight:600;"><span style="font-size:20px;">⚠️</span><span>${translations[currentLanguage].walletUsedSimple}</span></div>
                 <div>${formatted}</div>
                 <div>${currentLanguage==='zh'?'余额：':'Balance:'} ${balanceText}</div>

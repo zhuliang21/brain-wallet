@@ -1,5 +1,14 @@
 /* Shared styles for all pages to ensure consistent layout */
 
+/* 本地字体定义 */
+@font-face {
+  font-family: 'LXGWWenKai';
+  src: url('./fonts/LXGWWenKai-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Prevent layout shift/flicker on load */
 html, body {
   opacity: 0;
