@@ -18,74 +18,105 @@
   <style>
     /* Page-specific styles for brain wallet */
     
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-    
 
-    
-    .modal-content {
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 24px;
-      padding: 2rem;
-      max-width: 90vw;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    }
-    
 
     
     .generate-btn {
-      padding: 15px 30px;
-      background: linear-gradient(135deg, #9333ea, #7c3aed);
-      color: white;
-      border: 2px solid rgba(255, 255, 255, 0.6);
-      border-radius: 25px;
-      font-size: 16px;
-      font-weight: 600;
+      width: 100%;
+      max-width: 300px;
+      padding: 12px 20px;
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(46, 139, 87, 0.12) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(50, 205, 50, 0.08) 0%, rgba(46, 139, 87, 0.06) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%),
+        rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(20px) saturate(1.8);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
+      color: #e8e8e8;
+      border: 1px solid rgba(46, 139, 87, 0.2);
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+      overflow: hidden;
+      height: fit-content;
+      box-shadow: 
+        0 8px 32px rgba(46, 139, 87, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -1px 0 rgba(46, 139, 87, 0.05);
+      letter-spacing: 0.2px;
+    }
+    
+    .generate-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(46, 139, 87, 0.15) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(50, 205, 50, 0.1) 0%, rgba(46, 139, 87, 0.08) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: inherit;
     }
     
     .generate-btn:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 10px 25px rgba(147, 51, 234, 0.3);
+      transform: translateY(-2px) scale(1.02);
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(46, 139, 87, 0.18) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(50, 205, 50, 0.12) 0%, rgba(46, 139, 87, 0.1) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%),
+        rgba(255, 255, 255, 0.05);
+      border-color: rgba(46, 139, 87, 0.35);
+      backdrop-filter: blur(25px) saturate(2.2);
+      -webkit-backdrop-filter: blur(25px) saturate(2.2);
+      box-shadow: 
+        0 12px 40px rgba(46, 139, 87, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -1px 0 rgba(46, 139, 87, 0.1),
+        0 0 0 1px rgba(46, 139, 87, 0.08);
+      color: #f0f8f0;
+    }
+    
+    .generate-btn:hover::before {
+      opacity: 1;
     }
     
     .section-title {
       font-size: 1.5rem;
       font-weight: bold;
-      color: #334155;
+      color: #e0e0e0;
       margin-bottom: 20px;
       display: flex;
       align-items: center;
       gap: 10px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
     
     .info-box {
-      background: rgba(255, 255, 255, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(15px) saturate(1.2);
+      -webkit-backdrop-filter: blur(15px) saturate(1.2);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
       padding: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      box-shadow: 
+        0 4px 16px rgba(0,0,0,0.08),
+        0 1px 2px rgba(0,0,0,0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
     
     .input-display {
       font-family: 'Courier New', monospace;
       font-size: 14px;
-      color: #475569;
+      color: #b0b0b0;
       word-break: break-all;
       line-height: 1.6;
       min-height: 20px;
@@ -99,29 +130,49 @@
     }
     
     .mnemonic-word {
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      border-radius: 10px;
+      background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.06) 100%),
+        rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(15px) saturate(1.3);
+      -webkit-backdrop-filter: blur(15px) saturate(1.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
       padding: 15px;
       text-align: center;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.06),
+        0 1px 2px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     
     .mnemonic-word:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px) scale(1.02);
+      background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.1) 100%),
+        rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
     }
     
     .word-number {
       font-size: 10px;
-      color: #64748b;
+      color: rgba(255, 255, 255, 0.6);
       margin-bottom: 5px;
+      font-weight: 500;
     }
     
     .word-text {
       font-family: 'Courier New', monospace;
       font-weight: bold;
-      color: #334155;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
     
     .keys-grid {
@@ -132,75 +183,306 @@
     }
     
     .key-item {
-      background: rgba(255, 255, 255, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      border-radius: 15px;
+      background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%),
+        rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(15px) saturate(1.3);
+      -webkit-backdrop-filter: blur(15px) saturate(1.3);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
       padding: 20px;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.06),
+        0 1px 2px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
     
     .key-item:hover {
-      background: rgba(255, 255, 255, 0.6);
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%),
+        rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px) scale(1.01);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
     }
     
     .key-label {
       font-weight: bold;
-      color: #334155;
+      color: rgba(255, 255, 255, 0.9);
       margin-bottom: 15px;
       font-size: 16px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
     
     .key-value {
       font-family: 'Courier New', monospace;
       font-size: 12px;
-      color: #475569;
-      background: rgba(255, 255, 255, 0.6);
+      color: rgba(255, 255, 255, 0.8);
+      background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%),
+        rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 10px;
       word-break: break-all;
       line-height: 1.4;
       margin-bottom: 10px;
+      box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
     
     .address-label {
       font-size: 14px;
       font-weight: 500;
-      color: #64748b;
+      color: rgba(255, 255, 255, 0.7);
       margin-bottom: 8px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
     
     .address-value {
       font-family: 'Courier New', monospace;
       font-size: 12px;
-      color: #7c3aed;
-      background: rgba(255, 255, 255, 0.6);
+      color: rgba(124, 58, 237, 0.9);
+      background: 
+        linear-gradient(135deg, rgba(124, 58, 237, 0.06) 0%, rgba(124, 58, 237, 0.03) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%),
+        rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(10px) saturate(1.2);
+      -webkit-backdrop-filter: blur(10px) saturate(1.2);
+      border: 1px solid rgba(124, 58, 237, 0.15);
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 10px;
       word-break: break-all;
       line-height: 1.4;
       font-weight: bold;
+      box-shadow: 
+        0 2px 8px rgba(124, 58, 237, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
     
     .check-usage-btn {
       display: block;
-      margin: 30px auto;
-      padding: 15px 30px;
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: white;
-      border: 2px solid rgba(255, 255, 255, 0.6);
-      border-radius: 25px;
-      font-size: 16px;
-      font-weight: 600;
+      margin: 20px auto;
+      width: 100%;
+      max-width: 300px;
+      padding: 12px 20px;
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(138, 43, 226, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(138, 43, 226, 0.06) 0%, rgba(75, 0, 130, 0.06) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%),
+        rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      color: #e8e8e8;
+      border: 1px solid rgba(138, 43, 226, 0.15);
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 
+        0 8px 32px rgba(138, 43, 226, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -1px 0 rgba(138, 43, 226, 0.05);
+      letter-spacing: 0.2px;
+    }
+    
+    .check-usage-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(138, 43, 226, 0.12) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(138, 43, 226, 0.08) 0%, rgba(75, 0, 130, 0.08) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: inherit;
     }
     
     .check-usage-btn:hover {
-      transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+      transform: translateY(-2px) scale(1.02);
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(138, 43, 226, 0.1) 0%, rgba(75, 0, 130, 0.1) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%),
+        rgba(255, 255, 255, 0.05);
+      border-color: rgba(138, 43, 226, 0.3);
+      backdrop-filter: blur(25px) saturate(1.8);
+      -webkit-backdrop-filter: blur(25px) saturate(1.8);
+      box-shadow: 
+        0 12px 40px rgba(138, 43, 226, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -1px 0 rgba(138, 43, 226, 0.08),
+        0 0 0 1px rgba(138, 43, 226, 0.08);
+      color: #f0e8ff;
+    }
+    
+    .check-usage-btn:hover::before {
+      opacity: 1;
+    }
+    
+    /* 按钮激活状态 */
+    .generate-btn:active {
+      transform: translateY(0) scale(0.98);
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(46, 139, 87, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(50, 205, 50, 0.06) 0%, rgba(46, 139, 87, 0.04) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%),
+        rgba(255, 255, 255, 0.02);
+      box-shadow: 
+        0 4px 16px rgba(46, 139, 87, 0.06),
+        inset 0 2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    .action-btn:active {
+      transform: translateY(0) scale(0.98);
+      background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%),
+        rgba(255, 255, 255, 0.02);
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.12),
+        inset 0 2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    #copyMnemonic:active {
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(0, 123, 255, 0.08) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(0, 123, 255, 0.04) 0%, rgba(0, 86, 179, 0.04) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%),
+        rgba(255, 255, 255, 0.02);
+      box-shadow: 
+        0 4px 16px rgba(0, 123, 255, 0.06),
+        inset 0 2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    #newWalletBtn:active {
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(255, 193, 7, 0.08) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(255, 193, 7, 0.04) 0%, rgba(255, 165, 0, 0.04) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%),
+        rgba(255, 255, 255, 0.02);
+      box-shadow: 
+        0 4px 16px rgba(255, 193, 7, 0.06),
+        inset 0 2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    .check-usage-btn:active {
+      transform: translateY(0) scale(0.98);
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(138, 43, 226, 0.08) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(138, 43, 226, 0.04) 0%, rgba(75, 0, 130, 0.04) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%),
+        rgba(255, 255, 255, 0.02);
+      box-shadow: 
+        0 4px 16px rgba(138, 43, 226, 0.06),
+        inset 0 2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    /* 增强玻璃通透效果 - 添加细微动画 */
+    @keyframes glassShimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+    
+    .generate-btn::after,
+    .action-btn::after,
+    .check-usage-btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+      background-size: 200% 100%;
+      animation: glassShimmer 3s ease-in-out infinite;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    
+    .generate-btn:hover::after,
+    .action-btn:hover::after,
+    .check-usage-btn:hover::after {
+      opacity: 0.6;
+      animation-duration: 1.5s;
+    }
+    
+    /* 按钮聚焦状态 */
+    .generate-btn:focus,
+    .action-btn:focus,
+    .check-usage-btn:focus {
+      outline: none;
+      box-shadow: 
+        0 0 0 3px rgba(255, 255, 255, 0.1),
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+    
+    .generate-btn:focus {
+      box-shadow: 
+        0 0 0 3px rgba(46, 139, 87, 0.2),
+        0 8px 32px rgba(46, 139, 87, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+    
+    #copyMnemonic:focus {
+      box-shadow: 
+        0 0 0 3px rgba(0, 123, 255, 0.2),
+        0 8px 32px rgba(0, 123, 255, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+    
+    #newWalletBtn:focus {
+      box-shadow: 
+        0 0 0 3px rgba(255, 193, 7, 0.2),
+        0 8px 32px rgba(255, 193, 7, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+    
+    .check-usage-btn:focus {
+      box-shadow: 
+        0 0 0 3px rgba(138, 43, 226, 0.2),
+        0 8px 32px rgba(138, 43, 226, 0.08),
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }
     
     .usage-results {
@@ -218,13 +500,18 @@
     }
     
     .square-container {
-      width: 400px;
-      height: 400px;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      border-radius: 15px;
+      width: 380px;
+      height: 380px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(15px) saturate(1.2);
+      -webkit-backdrop-filter: blur(15px) saturate(1.2);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
       padding: 20px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 
+        0 4px 16px rgba(0,0,0,0.08),
+        0 1px 2px rgba(0,0,0,0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
       display: flex;
       flex-direction: column;
     }
@@ -292,119 +579,33 @@
       font-size: 11px;
     }
     
-    .disclaimer-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-      margin-bottom: 30px;
-    }
-    
-    .warning-banner {
-      background: rgba(255, 243, 205, 0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 234, 167, 0.8);
-      border-radius: 15px;
-      color: #856404;
-      padding: 15px 20px;
-      margin: 20px auto;
-      text-align: center;
-      position: relative;
-      box-shadow: 0 4px 15px rgba(255, 183, 77, 0.15);
-      max-width: 1200px;
-    }
-    
-    .warning-banner .close-btn {
-      position: absolute;
-      top: 8px;
-      right: 15px;
-      background: none;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      color: #856404;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-    }
-    
-    .warning-banner .close-btn:hover {
-      background: rgba(133, 100, 4, 0.1);
-    }
-    
-    .warning-banner-content {
-      font-size: 14px;
-      line-height: 1.4;
-      padding-right: 30px;
-    }
-    
-    .warning-banner-icon {
-      font-size: 16px;
-      margin-right: 8px;
-    }
-    
-    .new-wallet-btn {
-      position: absolute;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: white;
-      border: 2px solid rgba(255, 255, 255, 0.6);
-      border-radius: 25px;
-      padding: 10px 20px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      z-index: 5;
-    }
-    
-    .new-wallet-btn:hover {
-      transform: translateX(-50%) translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
-    }
-    
-    /* Adjust container top margin when banner is visible */
-    .container.with-warning {
-      margin-top: 50px;
-    }
-    
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes slideUp {
-      from {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-    }
+
 
     @media (max-width: 768px) {
-      .disclaimer-grid {
-        grid-template-columns: 1fr;
-      }
       .generate-btn {
         width: 100%;
         max-width: 400px;
-        padding: 18px 30px;
-        font-size: 18px;
+        padding: 14px 24px;
+        font-size: 16px;
+      }
+      
+      .check-usage-btn {
+        width: 100%;
+        max-width: 400px;
+        padding: 14px 24px;
+        font-size: 16px;
+      }
+      
+      #generatedImage {
+        max-width: 289px !important;
+      }
+      
+      .wallet-image {
+        max-width: 289px;
+      }
+      
+      .image-container {
+        padding: 0 15px;
       }
       .keys-grid {
         grid-template-columns: 1fr;
@@ -427,14 +628,218 @@
       }
     }
 
+    /* Action button styles */
+    .action-btn {
+      padding: 10px 20px;
+      background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%),
+        rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      color: #e8e8e8;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+      flex: 1;
+      min-width: 180px;
+      max-width: 240px;
+      justify-content: center;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+      letter-spacing: 0.2px;
+    }
+    
+    /* 复制按钮特殊样式 */
+    #copyMnemonic {
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(0, 123, 255, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(0, 123, 255, 0.06) 0%, rgba(0, 86, 179, 0.06) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%),
+        rgba(255, 255, 255, 0.02);
+      border-color: rgba(0, 123, 255, 0.15);
+    }
+    
+    /* 新钱包按钮特殊样式 */
+    #newWalletBtn {
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(255, 193, 7, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(255, 193, 7, 0.06) 0%, rgba(255, 165, 0, 0.06) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%),
+        rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 193, 7, 0.15);
+    }
+    
+    .action-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: inherit;
+    }
+    
+    /* 复制按钮悬停前景 */
+    #copyMnemonic::before {
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(0, 123, 255, 0.12) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(0, 123, 255, 0.08) 0%, rgba(0, 86, 179, 0.08) 100%);
+    }
+    
+    /* 新钱包按钮悬停前景 */
+    #newWalletBtn::before {
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(255, 193, 7, 0.12) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(255, 193, 7, 0.08) 0%, rgba(255, 165, 0, 0.08) 100%);
+    }
+    
+    .action-btn:hover {
+      background: 
+        linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%),
+        rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px) scale(1.02);
+      backdrop-filter: blur(25px) saturate(1.8);
+      -webkit-backdrop-filter: blur(25px) saturate(1.8);
+      box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+      color: #f5f5f5;
+    }
+    
+    /* 复制按钮悬停效果 */
+    #copyMnemonic:hover {
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(0, 123, 255, 0.15) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(0, 86, 179, 0.1) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%),
+        rgba(255, 255, 255, 0.05);
+      border-color: rgba(0, 123, 255, 0.3);
+      box-shadow: 
+        0 12px 40px rgba(0, 123, 255, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -1px 0 rgba(0, 123, 255, 0.08),
+        0 0 0 1px rgba(0, 123, 255, 0.08);
+      color: #e8f4ff;
+    }
+    
+    /* 新钱包按钮悬停效果 */
+    #newWalletBtn:hover {
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(255, 193, 7, 0.15) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 165, 0, 0.1) 100%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%),
+        rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 193, 7, 0.3);
+      box-shadow: 
+        0 12px 40px rgba(255, 193, 7, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -1px 0 rgba(255, 193, 7, 0.08),
+        0 0 0 1px rgba(255, 193, 7, 0.08);
+      color: #fffacd;
+    }
+    
+    .action-btn:hover::before {
+      opacity: 1;
+    }
+    
+    /* Action buttons container */
+    .action-buttons-container {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    /* Image container and wallet image */
+    .image-container {
+      text-align: center;
+      margin-bottom: 25px;
+      padding: 0 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .wallet-image {
+      display: none;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      max-width: 306px;
+      width: 100%;
+      margin: 0 auto;
+      box-shadow: 
+        0 4px 16px rgba(0,0,0,0.08),
+        0 1px 2px rgba(0,0,0,0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+    
+    .wallet-image:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+
     @media (max-width: 480px) {
-      .warning-banner {
-        margin: 15px 0;
-        padding: 12px 15px;
-      }
       .input-field {
         padding: 18px 22px;
         font-size: 16px;
+      }
+      
+      .wallet-image {
+        max-width: 255px;
+      }
+      
+      .image-container {
+        padding: 0 15px;
+      }
+      
+      #generatedImage {
+        max-width: 255px !important;
+      }
+      
+      .action-buttons-container {
+        gap: 12px;
+        margin-top: 20px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        max-width: 100%;
+      }
+      
+      .action-btn {
+        flex: 1;
+        max-width: 180px;
+        min-width: 140px;
+        padding: 12px 16px;
+        font-size: 13px;
+        justify-content: center;
       }
       .mnemonic-grid {
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -445,11 +850,6 @@
       }
       .key-item {
         padding: 15px;
-      }
-      .new-wallet-btn {
-        top: 60px;
-        padding: 8px 16px;
-        font-size: 12px;
       }
       #mainSection {
         padding-top: 30px !important;
@@ -483,94 +883,30 @@
 </head>
 
 <body>
-  <!-- Disclaimer Modal -->
-  <div id="disclaimerModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-      <div style="text-align: center; margin-bottom: 30px;">
-        <h2 style="font-size: 2rem; margin-bottom: 10px;">🧠 Brain Wallet</h2>
-        <p style="color: #64748b;">Important Disclaimer & Security Notice</p>
-      </div>
-      
-      <div class="disclaimer-grid">
-        <!-- English -->
-        <div>
-          <h3 style="color: #334155; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">English</h3>
-          <ul style="list-style: none; padding: 0;">
-            <li style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px;">
-              <span style="color: #10b981; font-size: 8px; margin-top: 6px;">●</span>
-              <span><strong>Open Source:</strong> This project is open source and recommended for offline use to ensure maximum security.</span>
-            </li>
-            <li style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px;">
-              <span style="color: #f59e0b; font-size: 8px; margin-top: 6px;">●</span>
-              <span><strong>Security Risk:</strong> Brain wallets carry inherent risks. Please ensure you use sufficiently long and complex passphrases with high entropy.</span>
-            </li>
-            <li style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px;">
-              <span style="color: #ef4444; font-size: 8px; margin-top: 6px;">●</span>
-              <span><strong>Educational Only:</strong> This tool is for educational purposes only. Never use it with real funds or production environments.</span>
-            </li>
-          </ul>
-        </div>
-        
-        <!-- Chinese -->
-        <div>
-          <h3 style="color: #334155; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">中文</h3>
-          <ul style="list-style: none; padding: 0;">
-            <li style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px;">
-              <span style="color: #10b981; font-size: 8px; margin-top: 6px;">●</span>
-              <span><strong>开源项目：</strong> 本项目为开源项目，建议离线使用以确保最大安全性。</span>
-            </li>
-            <li style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px;">
-              <span style="color: #f59e0b; font-size: 8px; margin-top: 6px;">●</span>
-              <span><strong>安全风险：</strong> 脑钱包存在固有风险，请确保使用足够长且复杂的高熵密码短语。</span>
-            </li>
-            <li style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px;">
-              <span style="color: #ef4444; font-size: 8px; margin-top: 6px;">●</span>
-              <span><strong>仅供教育：</strong> 此工具仅供教育目的使用，请勿用于真实资金或生产环境。</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-      
-      <div style="text-align: center;">
-        <button id="acceptDisclaimer" style="padding: 15px 30px; background: linear-gradient(135deg, #9333ea, #7c3aed); color: white; border: 2px solid rgba(255, 255, 255, 0.6); border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.borderColor='rgba(255, 255, 255, 0.8)'; this.style.transform='translateY(-1px)'" onmouseout="this.style.borderColor='rgba(255, 255, 255, 0.6)'; this.style.transform='translateY(0)'">
-          I Understand & Accept / 我已理解并接受
-        </button>
-      </div>
-    </div>
-  </div>
+
 
   <div class="container">
     <div class="header-controls">
-      <div style="color: white; font-size: 16px; font-weight: 600; position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap;" data-i18n="title">🧠 Brain Wallet</div>
+      <div></div> <!-- 占位元素，保持布局平衡 -->
+      <div class="app-title" data-i18n="title">🧠 Brain Wallet</div>
       <button class="language-toggle" onclick="toggleLanguage()">EN</button>
     </div>
 
-    <!-- New Wallet Button (hidden initially) -->
-    <button id="newWalletBtn" class="new-wallet-btn" style="display: none;" data-i18n="newWalletBtn">🔄 Generate New Wallet</button>
 
-    <!-- Header -->
-    <div class="header-section">
-    </div>
+
+
 
     <!-- Input Section -->
     <div id="inputSection" class="content-section" style="margin-bottom: 40px;">
       <div class="input-section">
-        <input type="text" 
-               id="entropyInput" 
-               class="input-field"
-               data-i18n-placeholder="inputPlaceholder" placeholder="Enter any text to generate wallet" />
+        <textarea id="entropyInput" 
+                  class="input-field"
+                  rows="5"
+                  data-i18n-placeholder="inputPlaceholder" 
+                  placeholder="Enter long, unique, and complex text (minimum 20 characters recommended)&#10;&#10;Brain wallets cannot provide sufficient randomness and are for testing purposes only. Use with caution."></textarea>
         <button id="genMnemonic" class="generate-btn" data-i18n="generateBtn">
           Generate Wallet
         </button>
-      </div>
-      
-      <!-- Warning Banner -->
-      <div id="warningBanner" class="warning-banner">
-        <button class="close-btn" onclick="closeWarningBanner()">×</button>
-        <div class="warning-banner-content">
-          <span class="warning-banner-icon">⚠️</span>
-          <span data-i18n="warningBanner">Brain wallets cannot provide sufficient randomness and are for testing purposes only. Use with caution.</span>
-        </div>
       </div>
     </div>
 
@@ -579,15 +915,9 @@
       
       <!-- Combined QR Code and Mnemonic Layout -->
       <div class="content-section">
-        <h2 style="font-size: 1.3rem; font-weight: bold; color: white; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-          <span>🔐</span>
-          <span data-i18n="mnemonicTitle">Mnemonic Phrase</span>
-        </h2>
-        
         <!-- Generated Image Display -->
-        <div style="text-align: center; margin-bottom: 20px;">
-          <img id="generatedImage" style="display: none; border: 2px solid #d1d5db; border-radius: 12px; max-width: 100%; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;" alt="Generated wallet image">
-          <p id="downloadHint" style="display: none; margin-top: 10px; color: #64748b; font-size: 14px; font-style: italic;" data-i18n="downloadHint">Click image to download</p>
+        <div class="image-container">
+          <img id="generatedImage" class="wallet-image" alt="Generated wallet image">
         </div>
         
         <!-- Hidden elements for compatibility -->
@@ -599,9 +929,12 @@
         </div>
         
         <!-- Action buttons -->
-        <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
-          <button id="copyMnemonic" style="padding: 12px 24px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: 2px solid rgba(255, 255, 255, 0.6); border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;" data-i18n="copyBtn">
-            📋 Copy Mnemonic
+        <div class="action-buttons-container">
+          <button id="copyMnemonic" class="action-btn" data-i18n="copyBtn">
+            Copy Mnemonic
+          </button>
+          <button id="newWalletBtn" class="action-btn" data-i18n="newWalletBtn">
+            New Wallet
           </button>
         </div>
         
@@ -616,7 +949,7 @@
       
       <!-- Check Usage Section -->
       <div class="content-section" style="text-align: center;">
-        <button id="fetchUsage" style="display: block; margin: 30px auto; padding: 15px 30px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: 2px solid rgba(255, 255, 255, 0.6); border-radius: 25px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;" data-i18n="checkUsageBtn">Check Wallet Usage</button>
+        <button id="fetchUsage" class="check-usage-btn" data-i18n="checkUsageBtn">Check Wallet Usage</button>
         <div id="usageResults" style="text-align: center; margin-top: 20px;"></div>
       </div>
     </div>
@@ -625,66 +958,27 @@
   <script src="dist/brain-wallet.bundle.js"></script>
   
   <script>
-    function showDisclaimer() {
-      const modal = document.getElementById('disclaimerModal');
-      modal.style.display = 'flex';
-    }
-
-    function hideDisclaimer() {
-      const modal = document.getElementById('disclaimerModal');
-      modal.style.display = 'none';
-      localStorage.setItem('brainWalletDisclaimerAccepted', 'true');
-    }
-
-    // toggleLanguage function is provided by the JavaScript bundle
-
     // Initialize page
     function initializePage() {
-      // Check if disclaimer was already accepted
-      const disclaimerAccepted = localStorage.getItem('brainWalletDisclaimerAccepted');
-      if (disclaimerAccepted !== 'true') {
-        showDisclaimer();
-      } else {
-        hideDisclaimer();
-      }
+      // Show content with smooth fade-in
+      document.documentElement.classList.add('loaded');
+      document.body.classList.add('loaded');
       
-      // Handle disclaimer acceptance
-      document.getElementById('acceptDisclaimer').addEventListener('click', hideDisclaimer);
+      // Signal that page is ready for bundle.js initialization
+      window.pageReady = true;
       
-      // Show content with smooth fade-in after ensuring styles are loaded
-      setTimeout(() => {
-        document.documentElement.classList.add('loaded');
-        document.body.classList.add('loaded');
-        
-        // Signal that page is ready for bundle.js initialization
-        window.pageReady = true;
-        
-        // Trigger bundle.js initialization if it's already loaded but waiting
-        if (window.initializeBundleApp && typeof window.initializeBundleApp === 'function') {
-          window.initializeBundleApp();
-        }
-      }, 50);
-    }
-
-    // Initialize as soon as DOM is ready and bundle is loaded
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initializePage);
-    } else {
-      // DOM is already ready
-      initializePage();
-    }
-    
-    // Fallback: ensure page is visible after maximum wait time
-    setTimeout(() => {
-      if (!document.documentElement.classList.contains('loaded')) {
-        document.documentElement.classList.add('loaded');
-        document.body.classList.add('loaded');
-      }
-      // Additional fallback initialization
+      // Trigger bundle.js initialization if it's already loaded
       if (window.initializeBundleApp && typeof window.initializeBundleApp === 'function') {
         window.initializeBundleApp();
       }
-    }, 500);
+    }
+
+    // Initialize as soon as DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializePage);
+    } else {
+      initializePage();
+    }
   </script>
 </body>
 </html>
